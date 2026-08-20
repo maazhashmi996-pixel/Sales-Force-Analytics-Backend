@@ -1,27 +1,29 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-const schemaRoutes = require('./routes/schemaRoutes');
+require('./queues/workflow.worker'); // Initialize BullMQ worker
+
+const authRoutes = require('./routes/auth.routes');
+const metadataRoutes = require('./routes/metadata.routes');
+const recordRoutes = require('./routes/record.routes');
 
 const app = express();
-
-// Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({ origin: true, credentials: true }));
 
-// Database Connection
+// Connect Database
 connectDB();
 
-// Routes
+// Routes Mounting
 app.use('/api/auth', authRoutes);
-app.use('/api/crm', schemaRoutes);
-
-app.get('/', (req, res) => {
-    res.send('Enterprise CRM Backend is Running');
-});
+app.use('/api/metadata', metadataRoutes);
+app.use('/api/records', recordRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Enterprise CRM Backend Engine running on port ${PORT}`);
+});

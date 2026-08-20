@@ -1,13 +1,16 @@
-const Redis = require('ioredis');
+// Safe mock Redis configuration taake app bina Redis ke chale
+const redisConnection = {
+  status: 'ready',
+  on: () => {},
+  once: () => {},
+  off: () => {},
+  quit: async () => {},
+  disconnect: () => {},
+  get: async () => null,
+  set: async () => null,
+  del: async () => null,
+};
 
-const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+console.log('⚠️ Running without Redis (Mock mode)');
 
-redisClient.on('connect', () => {
-    console.log('Redis Connected Successfully');
-});
-
-redisClient.on('error', (err) => {
-    console.error('Redis Connection Error:', err);
-});
-
-module.exports = redisClient;
+module.exports = redisConnection;
